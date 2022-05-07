@@ -75,7 +75,7 @@ function* expand(puzzle, node) {
     console.log("moves");                           // test
     console.log(puzzle.actions(s));
     for (let action in puzzle.actions(s)) {
-        s1 = puzzle.result(s, action);
+        s1 = puzzle.result(s, puzzle.actions(s)[action]);
         console.log(s1);                            // test
         cost = node.pathCost + 1;
         node1 = new Node(s1, node, action, cost);
@@ -122,7 +122,7 @@ function breadthFirstSearch(puzzle) {
 
     frontier = new Queue;                   // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-    let j = 1;                              // test
+    let j = 14;                              // test
     let reached = [JSON.stringify(puzzle.initial)];         // array containing states already reached
     while (j > 0) {
     //while (!frontier.isEmpty()) {
@@ -149,9 +149,9 @@ function breadthFirstSearch(puzzle) {
             if (reached.indexOf(JSON.stringify(child.state)) == -1) { // || (child.pathCost < reached[child.state].pathCost)) {
                 reached.push(JSON.stringify(child.state));
                 frontier.add(child);
-                // console.log("adding");      // test
+                console.log("adding");      // test
             }
-            // else (console.log("been here")); // test
+            else (console.log("been here")); // test
 
          // console.log(frontier); //test
         }
