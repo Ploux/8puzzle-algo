@@ -122,10 +122,10 @@ function breadthFirstSearch(puzzle) {
 
     frontier = new Queue;                   // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-    let j = 14;                              // test
+    // let j = 14;                              // test
     let reached = [JSON.stringify(puzzle.initial)];         // array containing states already reached
-    while (j > 0) {
-    //while (!frontier.isEmpty()) {
+    // while (j > 0) {                          // test
+    while (!frontier.isEmpty()) {
         console.log("Reached");                 // test
         console.log(reached);                   // test
         console.log("Frontier");                // test
@@ -155,7 +155,7 @@ function breadthFirstSearch(puzzle) {
 
          // console.log(frontier); //test
         }
-        j--;                                // test
+        // j--;                                // test
     }
     return "failure";
 }
@@ -165,15 +165,9 @@ function breadthFirstSearch(puzzle) {
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
+let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
+let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
+let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
-// 4 [1, 2, 3, 4, 0, 6, 7, 5, 8]
-// 6 [1, 2, 3, 4, 5, 6, 0, 7, 8]
-// 8 [1, 2, 3, 4, 5, 6, 7, 8, 0]
-/*
-console.log(p0.actions(p0.initial));
-console.log(JSON.stringify(p0.result(p0.initial, 4)));
-console.log(JSON.stringify(p0.result(p0.initial, 6)));
-console.log(JSON.stringify(p0.result(p0.initial, 8)));
-*/
 breadthFirstSearch(p0);
 
