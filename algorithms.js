@@ -60,34 +60,63 @@ class Node {
 class Queue {
 /* FIFO queue. Used to store the frontier in breadth-first search */
     constructor() {
-        this.frontier = [];
+        this.queue = [];
     }
-    isEmpty() {                         // returns true only if no nodes in frontier
-        return (this.frontier.length === 0);
+    isEmpty() {                         // returns true only if no nodes in queue
+        return (this.queue.length === 0);
     }
-    pop() {                             // removes top node from frontier and returns it
-        return (this.frontier.shift());
+    pop() {                             // removes top node from queue and returns it
+        return (this.queue.shift());
     }
-    top() {                             // returns (but does not remove) top node of frontier
-        return (this.frontier[0]);
+    top() {                             // returns (but does not remove) top node of queue
+        return (this.queue[0]);
     }
-    add(node) {                         // inserts node at end of frontier
-        this.frontier.push(node);
+    add(node) {                         // inserts node at end of queue
+        this.queue.push(node);
     }
     print() {                                               // print queue for testing
-        for (let i = 0; i < this.frontier.length; i++) {
-            console.log(this.frontier[i].state.slice(0,3));
-            console.log(this.frontier[i].state.slice(3,6));
-            console.log(this.frontier[i].state.slice(6));
+        for (let i = 0; i < this.queue.length; i++) {
+            console.log(this.queue[i].state.slice(0,3));
+            console.log(this.queue[i].state.slice(3,6));
+            console.log(this.queue[i].state.slice(6));
             console.log();
         }
     }
 }
 
+function breadthFirstSearch(puzzle) {
+/* search shallowest nodes in the search tree first */
+    node = new Node(puzzle.initial);        // start with the initial puzzle
+    if (puzzle.isGoal(puzzle.initial)) {    // it's already solved, bro
+        return node;
+    }
+
+    frontier = new Queue;                   // a new frontier
+    frontier.add(node);                     // put the initial puzzle in the frontier queue
+
+    let reached = [puzzle.initial];         // array containing states already reached
+    while (frontier) {
+        node = frontier.pop();
+
+    }
+
+    return 0;
+
+
+
+}
+
+
 
 
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
+
+console.log(breadthFirstSearch(p1));
+console.log(breadthFirstSearch(p2));
+
+
+/*
 // p2.print();
 // console.log(p1.initial);
 // console.log (p2.actions(p2.initial));
@@ -110,3 +139,4 @@ console.log();
 //console.log(q1.top());
 q1.pop();
 q1.print();
+*/
