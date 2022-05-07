@@ -63,16 +63,24 @@ class Queue {
         this.frontier = [];
     }
     isEmpty() {                         // returns true only if no nodes in frontier
-        return this.length() === 0;
+        return (this.frontier.length === 0);
     }
     pop() {                             // removes top node from frontier and returns it
-        return this.frontier.shift();
+        return (this.frontier.shift());
     }
     top() {                             // returns (but does not remove) top node of frontier
-        return this.frontier[0];
+        return (this.frontier[0]);
     }
     add(node) {                         // inserts node at end of frontier
         this.frontier.push(node);
+    }
+    print() {                                               // print queue for testing
+        for (let i = 0; i < this.frontier.length; i++) {
+            console.log(this.frontier[i].state.slice(0,3));
+            console.log(this.frontier[i].state.slice(3,6));
+            console.log(this.frontier[i].state.slice(6));
+            console.log();
+        }
     }
 }
 
@@ -88,4 +96,17 @@ let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 // console.log (p2.goal);
 // p2.print(p2.result(p2.initial, 0));
 let n1 = new Node(p1.initial);
-console.log(n1);
+let n2 = new Node(p2.initial);
+// console.log(n1);
+let q1 = new Queue;
+console.log(q1.isEmpty());
+q1.add(n1);
+// console.log(q1);
+q1.print();
+console.log(q1.isEmpty());
+q1.add(n2);
+q1.print();
+console.log();
+//console.log(q1.top());
+q1.pop();
+q1.print();
