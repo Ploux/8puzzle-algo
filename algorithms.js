@@ -1,23 +1,19 @@
 // inputs: a puzzle
+// outputs: array of moves to solve puzzle, (possibly time, or # of nodes expanded etc)
 
 class Puzzle {
-/* properties
-initial: array of puzzle initial state, integer specifying algorithm to use, max depth if depth limited is chosen
-goal (1, 2, 3, 4, 5, 6, 7, 8, 0)
-methods: actions (indexes of squares blank can move to),
-*/
 
     constructor(initial, algo, depth = 0) {
         this.initial = initial; // array of puzzle initial state
         this.algo = algo;       // integer specifying algorithm to use
         this.depth = depth;     // max depth if depth-limited is chosen
         this.goal = [1, 2, 3, 4, 5, 6, 7, 8, 0];
-
     }
 
     // test function to display initial board
     print() {
         console.log(this.initial);
+        // console.log(this.goal);
         }
 
     // The indexes of the possible squares that the blank can move to given its location
@@ -29,8 +25,22 @@ methods: actions (indexes of squares blank can move to),
 
     // result (what happens after an action)
 
-    // isGoal (puzzle is solved)
+
+    // isGoal (is puzzle solved?)
+    isGoal(state) {
+        return (JSON.stringify(state) == JSON.stringify(this.goal));
+    }
+
 }
+/*
+    def result(self, state, action):
+        """Swap the blank with the square numbered `action`."""
+        s = list(state)
+        blank = state.index(0)
+        s[action], s[blank] = s[blank], s[action]
+        return tuple(s)
+
+*/
 
 class Node {
 /* a node in a search tree */
@@ -44,10 +54,11 @@ class Node {
 
 }
 
-// outputs: array of moves to solve puzzle, (possibly time, or # of nodes expanded etc)
-
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
-p1.print();
+let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
+// p2.print();
 // console.log(p1.initial);
-console.log (p1.actions(p1.initial));
-
+// console.log (p2.actions(p2.initial));
+console.log (p1.isGoal(p1.initial));
+console.log (p2.isGoal(p2.initial));
+// console.log (p2.goal);
