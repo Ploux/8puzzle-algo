@@ -42,14 +42,23 @@ class Puzzle {
 class Node {
 /* a node in a search tree */
 
-    constructor() {
-      this.state = null;
-      this.parent = null;
-      this.action = null;
-      this.path_cost = null;
+    constructor(state, parent = null, action = null, pathCost = 0) {
+      this.state = state;           // board position in this state
+      this.parent = parent;         // mommy node in the tree that generated this node
+      this.action = action;         // action that was applied to mommy to generate this node
+      this.pathCost = pathCost;     // total cost of the path from initial state to this node
     }
+    len() {
+        if (this.parent == null) return 0;
+        else return (1 + len(this.parent));
+    }
+    lessThan(other) {
+        return (this.pathCost < other.pathCost);
+    }
+
 }
 
+/*
 class Queue {
   constructor() {
     this.collection = {};
@@ -75,7 +84,6 @@ class Queue {
     return this.size() === 0;
   }
 }
-
 function PriorityQueue () {
   this.collection = [];
   this.printCollection = function() {
@@ -107,13 +115,15 @@ function PriorityQueue () {
     return this.collection[0][0];
   }
 }
-
+*/
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
-p2.print();
+// p2.print();
 // console.log(p1.initial);
 // console.log (p2.actions(p2.initial));
 // console.log (p1.isGoal(p1.initial));
 // console.log (p2.isGoal(p2.initial));
 // console.log (p2.goal);
-p2.print(p2.result(p2.initial, 0));
+// p2.print(p2.result(p2.initial, 0));
+let n1 = new Node(p1.initial);
+console.log(n1);
