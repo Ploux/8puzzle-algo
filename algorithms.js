@@ -1,6 +1,7 @@
 // inputs: a puzzle
 // outputs: array of moves to solve puzzle, (possibly time, or # of nodes expanded etc)
 
+
 class Puzzle {
 /*an 8-puzzle problem */
 
@@ -28,9 +29,10 @@ class Puzzle {
 
     // result (swap the blank with the action square)
     result(state, action) {
-        let blank = state.indexOf(0);                                   // find the blank
-        [state[action], state[blank]] = [state[blank], state[action]];  // swap
-        return state;
+        const s = [...state]
+        let blank = s.indexOf(0);                                   // find the blank
+        [s[action], s[blank]] = [s[blank], s[action]];  // swap
+        return s;
     }
 
     // isGoal (is puzzle solved?)
@@ -38,6 +40,7 @@ class Puzzle {
         return (JSON.stringify(state) == JSON.stringify(this.goal));
     }
 }
+
 
 class Node {
 /* a node in a search tree */
@@ -55,7 +58,32 @@ class Node {
     lessThan(other) {
         return (this.pathCost < other.pathCost);
     }
+    print() {                                               // print node for testing
+            console.log(this.state.slice(0,3));
+            console.log(this.state.slice(3,6));
+            console.log(this.state.slice(6));
+            console.log();
+    }
 }
+
+function* expand(puzzle, node) {
+// expand a node, generating the child nodes
+    // console.log("expanding");                   // test
+
+    let s = [...node.state];
+
+    console.log("moves");                           // test
+    console.log(puzzle.actions(s));
+    for (let action in puzzle.actions(s)) {
+        s1 = puzzle.result(s, action);
+        console.log(s1);                            // test
+        cost = node.pathCost + 1;
+        node1 = new Node(s1, node, action, cost);
+       // console.log(JSON.stringify(node1.state));            // test
+        yield (node1);
+    }
+}
+
 
 class Queue {
 /* FIFO queue. Used to store the frontier in breadth-first search */
@@ -87,56 +115,65 @@ class Queue {
 function breadthFirstSearch(puzzle) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
+    // console.log(puzzle.actions(puzzle.initial));     // test
     if (puzzle.isGoal(puzzle.initial)) {    // it's already solved, bro
         return node;
     }
 
     frontier = new Queue;                   // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-
-    let reached = [puzzle.initial];         // array containing states already reached
-    while (frontier) {
+    let j = 1;                              // test
+    let reached = [JSON.stringify(puzzle.initial)];         // array containing states already reached
+    while (j > 0) {
+    //while (!frontier.isEmpty()) {
+        console.log("Reached");                 // test
+        console.log(reached);                   // test
+        console.log("Frontier");                // test
+        frontier.print();                       // test
+        console.log("popping node");        // test
         node = frontier.pop();
+        // node.print();                       // test
+        //console.log("printed")              // test
 
+        if (puzzle.isGoal(node.state)) {
+            return node;
+        }
+        // else console.log("not the goal");   // test
+        //for (let child in expand(puzzle, node)) {
+        const newNode = expand(puzzle, node);
+        for (let action in puzzle.actions(node.state)) {
+            console.log(action);             // test
+            let child = newNode.next().value;
+            // console.log(JSON.stringify(child.state));                 // test
+            // let s = child.state;
+            if (reached.indexOf(JSON.stringify(child.state)) == -1) { // || (child.pathCost < reached[child.state].pathCost)) {
+                reached.push(JSON.stringify(child.state));
+                frontier.add(child);
+                // console.log("adding");      // test
+            }
+            // else (console.log("been here")); // test
+
+         // console.log(frontier); //test
+        }
+        j--;                                // test
     }
-
-    return 0;
-
-
-
+    return "failure";
 }
 
 
-
-
+                   //0  1  2  3  4  5  6  7  8
+let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 
-console.log(breadthFirstSearch(p1));
-console.log(breadthFirstSearch(p2));
-
-
+// 4 [1, 2, 3, 4, 0, 6, 7, 5, 8]
+// 6 [1, 2, 3, 4, 5, 6, 0, 7, 8]
+// 8 [1, 2, 3, 4, 5, 6, 7, 8, 0]
 /*
-// p2.print();
-// console.log(p1.initial);
-// console.log (p2.actions(p2.initial));
-// console.log (p1.isGoal(p1.initial));
-// console.log (p2.isGoal(p2.initial));
-// console.log (p2.goal);
-// p2.print(p2.result(p2.initial, 0));
-let n1 = new Node(p1.initial);
-let n2 = new Node(p2.initial);
-// console.log(n1);
-let q1 = new Queue;
-console.log(q1.isEmpty());
-q1.add(n1);
-// console.log(q1);
-q1.print();
-console.log(q1.isEmpty());
-q1.add(n2);
-q1.print();
-console.log();
-//console.log(q1.top());
-q1.pop();
-q1.print();
+console.log(p0.actions(p0.initial));
+console.log(JSON.stringify(p0.result(p0.initial, 4)));
+console.log(JSON.stringify(p0.result(p0.initial, 6)));
+console.log(JSON.stringify(p0.result(p0.initial, 8)));
 */
+breadthFirstSearch(p0);
+
