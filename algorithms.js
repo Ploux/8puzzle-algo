@@ -55,67 +55,29 @@ class Node {
     lessThan(other) {
         return (this.pathCost < other.pathCost);
     }
-
 }
 
-/*
 class Queue {
-  constructor() {
-    this.collection = {};
-    this.start = 0;
-    this.end = 0;
-  }
-  print() {
-    console.log(this.collection);
-  }
-  enqueue(val) {
-    this.collection[this.end++] = val;
-  }
-  dequeue() {
-    return this.collection[this.start++];
-  }
-  front() {
-    return this.collection[this.start];
-  }
-  size() {
-    return this.end - this.start;
-  }
-  isEmpty() {
-    return this.size() === 0;
-  }
-}
-function PriorityQueue () {
-  this.collection = [];
-  this.printCollection = function() {
-    console.log(this.collection);
-  };
-
-  this.enqueue = function(item) {
-    let index = this.collection.findIndex(elem => elem[1] > item[1]);
-    if (index !== -1) {
-      this.collection.splice(index, 0, item);
-    } else {
-      this.collection.push(item);
+/* FIFO queue. Used to store the frontier in breadth-first search */
+    constructor() {
+        this.frontier = [];
     }
-  }
-
-  this.dequeue = function() {
-    return this.collection.shift()[0];
-  }
-
-  this.size = function() {
-    return this.collection.length;
-  }
-
-  this.isEmpty = function() {
-    return this.size() === 0;
-  }
-
-  this.front = function() {
-    return this.collection[0][0];
-  }
+    isEmpty() {                         // returns true only if no nodes in frontier
+        return this.length() === 0;
+    }
+    pop() {                             // removes top node from frontier and returns it
+        return this.frontier.shift();
+    }
+    top() {                             // returns (but does not remove) top node of frontier
+        return this.frontier[0];
+    }
+    add(node) {                         // inserts node at end of frontier
+        this.frontier.push(node);
+    }
 }
-*/
+
+
+
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 // p2.print();
