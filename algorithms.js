@@ -72,11 +72,11 @@ function* expand(puzzle, node) {
 
     let s = [...node.state];
 
-    console.log("moves");                           // test
-    console.log(puzzle.actions(s));
+//    console.log("moves");                           // test
+//    console.log(puzzle.actions(s));
     for (let action in puzzle.actions(s)) {
         s1 = puzzle.result(s, puzzle.actions(s)[action]);
-        console.log(s1);                            // test
+//        console.log(s1);                            // test
         cost = node.pathCost + 1;
         node1 = new Node(s1, node, action, cost);
        // console.log(JSON.stringify(node1.state));            // test
@@ -115,50 +115,43 @@ class Queue {
 function breadthFirstSearch(puzzle) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
-    // console.log(puzzle.actions(puzzle.initial));     // test
+    console.log ("Initial puzzle: ");       // test
+    node.print();                           // test
     if (puzzle.isGoal(puzzle.initial)) {    // it's already solved, bro
+        console.log("Already solved");      // test
         return node;
     }
-
     frontier = new Queue;                   // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-    // let j = 14;                              // test
+    console.log("Initial Frontier: ")               // test
+    frontier.print();
     let reached = [JSON.stringify(puzzle.initial)];         // array containing states already reached
-    // while (j > 0) {                          // test
+    console.log("reached: ");                       // test
+    console.log(reached);                       // test
+    console.log();                              // test
     while (!frontier.isEmpty()) {
-        console.log("Reached");                 // test
-        console.log(reached);                   // test
-        console.log("Frontier");                // test
-        frontier.print();                       // test
-        console.log("popping node");        // test
         node = frontier.pop();
-        // node.print();                       // test
-        //console.log("printed")              // test
-
-        if (puzzle.isGoal(node.state)) {
-            return node;
-        }
-        // else console.log("not the goal");   // test
-        //for (let child in expand(puzzle, node)) {
+        console.log ("expanding: ");            // test
+        node.print();                           // test
+        console.log ((puzzle.actions(node.state).length) + " possibilities"); // test
         const newNode = expand(puzzle, node);
         for (let action in puzzle.actions(node.state)) {
-            console.log(action);             // test
             let child = newNode.next().value;
-            // console.log(JSON.stringify(child.state));                 // test
-            // let s = child.state;
-            if (reached.indexOf(JSON.stringify(child.state)) == -1) { // || (child.pathCost < reached[child.state].pathCost)) {
+            child.print();
+            if (puzzle.isGoal(child.state)) {
+                console.log ("solved");         // test
+                return node;
+            }
+            if (reached.indexOf(JSON.stringify(child.state)) == -1) {
                 reached.push(JSON.stringify(child.state));
                 frontier.add(child);
-                console.log("adding");      // test
+//              frontier.print();              // test
             }
-            else (console.log("been here")); // test
-
-         // console.log(frontier); //test
         }
-        // j--;                                // test
-    }
     return "failure";
+    }
 }
+
 
 
                    //0  1  2  3  4  5  6  7  8
@@ -169,5 +162,5 @@ let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
 let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
 let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
-breadthFirstSearch(p0);
+breadthFirstSearch(p1);
 
