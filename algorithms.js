@@ -63,20 +63,42 @@ class Node {
 function heuristic(f, node) {
 /* 0 = no heuristic (f = g)
    1 = a* hamming distance
+   2 = a* manhattan distance
 */
-    if (f == 0) return node.pathCost;
-    if (f == 1) {
-        hammingDistance = 0;
-        let goal = [1,2,3,4,5,6,7,8,0];
-        for (let i = 0; i <= 8; i++) {
+    switch (f) {
+    case 0: return node.pathCost;
+            break;
 
-            if (node.state[i] != goal[i]) hammingDistance++
-        }
-        console.log(hammingDistance);   // test
-        return (node.pathCost + hammingDistance);
+    case 1: hammingDist = 0;
+            let goal = [1,2,3,4,5,6,7,8,0];
+            for (let i = 0; i <= 8; i++) {
+                if (node.state[i] != goal[i]) hammingDist++;
+            }
+            //console.log(hammingDist);   // test
+            return (node.pathCost + hammingDist);
+            break;
+/*
+let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
+let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
+*/
+
+    case 2: manhattanDist = 0;
+            let goalX = [2, 0, 1, 2, 0, 1, 2, 0, 1];
+            let goalY = [2, 0, 0, 0, 1, 1, 1, 2, 2];
+            let tileX = [0, 1, 2, 0, 1, 2, 0, 1, 2];
+            let tileY = [0, 0, 0, 1, 1, 1, 2, 2, 2];
+
+            for (let i = 0; i <= 8; i++) {
+                let tile = node.state[i];
+                let tilePos = tileX[i] + tileY[i];
+                let goalPos = goalX[tile] + goalY[tile];
+                manhattanDist += Math.abs(tilePos - goalPos);
+            }
+            console.log(manhattanDist); // test
+            return manhattanDist;
+            break;
+    default: return 0;
     }
-
-    return 0;
 }
 
 function* expand(puzzle, node, f = 0) {
@@ -98,8 +120,8 @@ function pathStates(node) {
         paths.unshift(node.state);
         node = node.parent;
     }
-    if (paths.length >1) paths.unshift(node.state);      // adds the starting state
-    console.log("Moves:" + (paths.length - 1));
+    if (paths.length > 1) paths.unshift(node.state);      // adds the final state if we didn't start at goal
+    console.log("Moves: " + (paths.length - 1));
     return paths;
 }
 
@@ -273,19 +295,24 @@ function bestFirstSearch(puzzle, f = 0) {
             else {
                 for (let i = 0; i < frontier.length; i++) {
                     if ((child.stateStr == frontier[i].stateStr) && (child.score < frontier[i].score)) {   // lower scores are better
+                        console.log("cheaper path found");
                         frontier.add(child);
                         break;
                     }
                 }
              }
         }
-        console.log("reached: " + reached.length);              // test
+        // console.log("reached: " + reached.length);              // test
     }
     return failure;
 }
 
 function aStarHamming(puzzle) {
     return bestFirstSearch(puzzle, 1);
+}
+
+function aStarManhattan(puzzle) {
+    return bestFirstSearch(puzzle, 2);
 }
 
 
@@ -299,13 +326,8 @@ let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
 let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 
-/*
 
-console.log(aStarHamming(p0));
+// console.log(aStarManhattan(p0));
 
-*/
-let paths = (pathStates(aStarHamming(p2)));
+let paths = (pathStates(aStarManhattan(p3)));
 console.log(paths);
-
-
-
