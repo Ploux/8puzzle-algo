@@ -59,16 +59,25 @@ class Node {
     }
 }
 
-function* expand(puzzle, node) {
+function heuristic(f, node) {
+    if (f == 0) return node.pathCost;
+
+    return 0;
+}
+
+function* expand(puzzle, node, f = 0) {
 /* expand a node, generating the child nodes */
     let s = [...node.state];
     for (let action in puzzle.actions(s)) {                 // 1-3 possible moves
         s1 = puzzle.result(s, puzzle.actions(s)[action]);   // the new state after we make that move
         cost = node.pathCost + 1;
         child = new Node(s1, node, action, cost);
+        child = heuristic(f, child);
         yield (child);
     }
 }
+
+
 
 function pathStates(node) {
 /* the sequence of states to get to this node */
@@ -124,7 +133,6 @@ class PriorityQueue {
         return (this.queue[0]);
     }
     add(node) {                                         // inserts node at proper location
-        let contain = false;
         for (let i = 0; i < this.queue.length; i++) {
             if (node.score <= this.queue[i].score) {    // lower scores are better
                 this.queue.splice(i, 0, node);          // insertion
@@ -140,10 +148,6 @@ class PriorityQueue {
         console.log();
     }
 }
-
-
-
-
 
 function breadthFirstSearch(puzzle) {
 /* search shallowest nodes in the search tree first */
@@ -206,6 +210,47 @@ function depthFirstSearch(puzzle, node = null) {
     }
 }
 
+function bestFirstSearch(puzzle, f = 0) {
+/* search shallowest nodes in the search tree first */
+    node = new Node(puzzle.initial);        // start with the initial puzzle
+    frontier = new PriorityQueue;           // a new frontier
+    frontier.add(node);                     // put the initial puzzle in the frontier queue
+    let reached = [puzzle.stateStr];         // array containing states already reached and their scores
+    if (puzzle.isGoal(puzzle.initialStr)) {    // it's already solved, bro
+        console.log(0);     // test
+        return node;
+    }
+    while (!frontier.isEmpty()) {
+        node = frontier.pop();                              // take the node with the lowest score
+        const newNode = expand(puzzle, node, f);               // create newNode to hold what comes out of generator
+        for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
+            let child = newNode.next().value;               // generate!
+            if (puzzle.isGoal(child.stateStr)) {               // finish as soon as we find a winner
+                console.log ("solved");         // test
+                console.log(node.pathCost);     // test
+                return node;
+            }
+            if (reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
+                reached.push(child.stateStr);              // add state to reached
+                frontier.add(child);                         // add child to frontier
+            }
+            else {
+                for (let i = 0; i < frontier.length; i++) {
+                    if ((child.stateStr == frontier[i].stateStr) && (child.score < frontier[i].score)) {   // lower scores are better
+                        frontier.add(child);
+                        break;
+                    }
+                }
+             }
+        }
+        console.log("reached: " + reached.length);              // test
+    }
+    return failure;
+}
+
+
+
+
 
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
@@ -217,11 +262,11 @@ let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 
 
-// console.log(depthFirstSearch(p0));
+console.log(bestFirstSearch(p0));
 
-
-let paths = (pathStates(depthFirstSearch(p0)));
+/*
+let paths = (pathStates(bestFirstSearch(p0)));
 console.log(paths);
-
+*/
 
 
