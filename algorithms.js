@@ -7,9 +7,10 @@ class Puzzle {
 
     constructor(initial, algo, depth = 0) {
         this.initial = initial; // array of puzzle initial state
+        this.initialStr = JSON.stringify(this.initial); // string of initial puzzle state
         this.algo = algo;       // integer specifying algorithm to use
         this.depth = depth;     // max depth if depth-limited is chosen
-        this.goal = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+        this.goal = "[1,2,3,4,5,6,7,8,0]";
     }
 
     // display board
@@ -35,8 +36,8 @@ class Puzzle {
     }
 
     // isGoal (is puzzle solved?)
-    isGoal(state) {
-        return (JSON.stringify(state) == JSON.stringify(this.goal));
+    isGoal(stateStr) {
+        return (stateStr == this.goal);
     }
 }
 
@@ -48,6 +49,7 @@ class Node {
       this.parent = parent;         // mommy node in the tree that generated this node
       this.action = action;         // action that was applied to mommy to generate this node
       this.pathCost = pathCost;     // total cost of the path from initial state to this node
+      this.stateStr = (state == null) ? "null" : JSON.stringify(state);     // string of state
     }
     print() {                                               // print node for testing
             console.log(this.state.slice(0,3));
@@ -78,6 +80,7 @@ function pathStates(node) {
     return paths;
 }
 
+let failure = new Node("failure", pathCost = Infinity);
 class Queue {
 /* FIFO queue. Used to store the frontier in breadth-first search */
     constructor() {
@@ -108,24 +111,25 @@ class Queue {
 function breadthFirstSearch(puzzle) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
-    if (puzzle.isGoal(puzzle.initial)) {    // it's already solved, bro
+    if (puzzle.isGoal(puzzle.initialStr)) {    // it's already solved, bro
+        console.log(0);     // test
         return node;
     }
     frontier = new Queue;                   // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-    let reached = [JSON.stringify(puzzle.initial)];         // array containing states already reached
+    let reached = [puzzle.stateStr];         // array containing states already reached
     while (!frontier.isEmpty()) {
         node = frontier.pop();                              // take the node that's been in there the longest
         const newNode = expand(puzzle, node);               // create newNode to hold what comes out of generator
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
-            if (puzzle.isGoal(child.state)) {               // finish as soon as we find a winner
+            if (puzzle.isGoal(child.stateStr)) {               // finish as soon as we find a winner
                 console.log ("solved");         // test
                 console.log(node.pathCost);     // test
                 return node;
             }
-            if (reached.indexOf(JSON.stringify(child.state)) == -1) {   // if we haven't been here before
-                reached.push(JSON.stringify(child.state));              // add state to reached
+            if (reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
+                reached.push(child.stateStr);              // add state to reached
                 frontier.add(child);                                    // add child to frontier
             }
             else {
@@ -138,9 +142,18 @@ function breadthFirstSearch(puzzle) {
 
 function isCycle(node, k = 30) {
 // checks if node forms a cycle of length k or less
+    console.log("start isCycle")        // test
     function findCycle(ancestor, k) {
+        let stateStr = (ancestor == null) ? "null" : JSON.stringify(ancestor.state);
+        console.log("Testing " + stateStr + " K:" + k);       // test
         return (ancestor != null && k > 0 && (JSON.stringify(ancestor.state) == JSON.stringify(node.state) || findCycle(ancestor.parent, k - 1)));
     }
+    console.log("find cycle: " );           // test
+    if (node.parent == null) {              // test
+        console.log("root");                // test
+        }                                   // test
+    else console.log(JSON.stringify(node.parent.state));        // test
+    console.log("K: " + k);             // test
     return findCycle(node.parent, k);
 }
 
@@ -152,8 +165,9 @@ function depthFirstSearch(puzzle, node = null) {
     if (puzzle.isGoal(node.state)) {    // solved, bro
         return node;
     }
-    else if (isCycle(node)) return "failure";
+    else if (isCycle(node)) return failure;
     else {
+        console.log("expanding");       // test
         const newNode = expand(puzzle, node);
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
@@ -172,8 +186,14 @@ let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
 let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
 let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
-console.log(depthFirstSearch(p1));
+
+
+// console.log(depthFirstSearch(p0));
+
 /*
-let paths = (pathStates(depthFirstSearch(p0)));
+let paths = (pathStates(breadthFirstSearch(p0)));
 console.log(paths);
 */
+
+
+
