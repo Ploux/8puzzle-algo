@@ -44,15 +44,11 @@ class Puzzle {
 class Node {
 /* a node in a search tree */
 
-    constructor(state, parent = null, action = null, pathCost = 0) {
+    constructor(state, parent = null, action = null, pathCost = 1) {
       this.state = state;           // board position in this state
       this.parent = parent;         // mommy node in the tree that generated this node
       this.action = action;         // action that was applied to mommy to generate this node
       this.pathCost = pathCost;     // total cost of the path from initial state to this node
-    }
-    len() {                                                 // how many moves it took to get here
-        if (this.parent == null) return 1;
-        else return (1 + this.parent.len());
     }
     print() {                                               // print node for testing
             console.log(this.state.slice(0,3));
@@ -62,21 +58,25 @@ class Node {
 }
 
 function* expand(puzzle, node) {
-// expand a node, generating the child nodes
-    // console.log("expanding");                   // test
-
+/* expand a node, generating the child nodes */
     let s = [...node.state];
-
-//    console.log("moves");                           // test
-//    console.log(puzzle.actions(s));
-    for (let action in puzzle.actions(s)) {
-        s1 = puzzle.result(s, puzzle.actions(s)[action]);
-//        console.log(s1);                            // test
+    for (let action in puzzle.actions(s)) {                 // 1-3 possible moves
+        s1 = puzzle.result(s, puzzle.actions(s)[action]);   // the new state after we make that move
         cost = node.pathCost + 1;
-        node1 = new Node(s1, node, action, cost);
-       // console.log(JSON.stringify(node1.state));            // test
-        yield (node1);
+        child = new Node(s1, node, action, cost);
+        yield (child);
     }
+}
+
+function pathStates(node) {
+/* the sequence of states to get to this node */
+    let paths = [[1, 2, 3, 4, 5, 6, 7, 8, 0]];      // make [] if you don't want the starting state in the array
+    while (node.parent != null) {
+        paths.unshift(node.state);
+        node = node.parent;
+    }
+    paths.unshift(node.state);      // adds the starting state
+    return paths;
 }
 
 
@@ -112,57 +112,33 @@ class Queue {
 function breadthFirstSearch(puzzle) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
-    console.log ("Initial puzzle: ");       // test
-    node.print();                           // test
-   console.log();                              // test
     if (puzzle.isGoal(puzzle.initial)) {    // it's already solved, bro
-        console.log("Already solved");      // test
         return node;
     }
     frontier = new Queue;                   // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-//    console.log("Initial Frontier: ")               // test
-//    frontier.print();
     let reached = [JSON.stringify(puzzle.initial)];         // array containing states already reached
-//    console.log("reached: ");                       // test
-//    console.log(reached);                       // test
-    console.log();                              // test
     while (!frontier.isEmpty()) {
-        node = frontier.pop();
-//      console.log ("expanding: ");            // test
-//      node.print();                           // test
-//      console.log ((puzzle.actions(node.state).length) + " possibilities"); // test
-//      console.log();                              // test
-        const newNode = expand(puzzle, node);
-        for (let action in puzzle.actions(node.state)) {
-            let child = newNode.next().value;
-//          child.print();
-
-            if (puzzle.isGoal(child.state)) {
+        node = frontier.pop();                              // take the node that's been in there the longest
+        const newNode = expand(puzzle, node);               // create newNode to hold what comes out of generator
+        for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
+            let child = newNode.next().value;               // generate!
+            if (puzzle.isGoal(child.state)) {               // finish as soon as we find a winner
                 console.log ("solved");         // test
-                console.log(node.len());
+                console.log(node.pathCost);     // test
                 return node;
             }
-            if (reached.indexOf(JSON.stringify(child.state)) == -1) {
-//              console.log("not reached");     // test
-                reached.push(JSON.stringify(child.state));
-                frontier.add(child);
+            if (reached.indexOf(JSON.stringify(child.state)) == -1) {   // if we haven't been here before
+                reached.push(JSON.stringify(child.state));              // add state to reached
+                frontier.add(child);                                    // add child to frontier
             }
             else {
-//                console.log("reached");     // test
             }
         }
-//        console.log();                              // test
         console.log("reached: " + reached.length);              // test
-//        console.log(reached.length);                       // test
-        //       console.log();                              // test
-        //console.log("New Frontier: ")               // test
-        //frontier.print();                           // test
     }
     return "failure";
 }
-
-
 
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 0, 7, 8], 0);
@@ -172,5 +148,5 @@ let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
 let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
 let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
-breadthFirstSearch(p3);
-
+let paths = (pathStates(breadthFirstSearch(p0)));
+console.log(paths);
