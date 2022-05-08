@@ -138,67 +138,40 @@ function breadthFirstSearch(puzzle) {
     return failure;
 }
 
-/* remove this
-function isCycle(node, k = 30) {
-// checks if node forms a cycle of length k or less
-    // console.log("start isCycle")        // test
-    function findCycle(ancestor, k) {
-        let ancStateStr = (ancestor == null) ? "null" : ancestor.stateStr;
-        // tests
-        console.log("Testing " + ancStateStr + " K:" + k);
-
-        console.log("ancestor != null? " + (ancestor != null));
-        console.log("k > 0? " + (k > 0));
-        console.log();
-
-        console.log(node.stateStr);
-        console.log("ancStateStr == node.stateStr? " + (ancStateStr == node.stateStr));
-        console.log();
-        return (ancestor != null && k > 0 && ((ancStateStr == node.stateStr) || findCycle(ancestor.parent, k - 1)));
-    }
-   // process.stdout.write("find cycle: " );           // test
-   // if (node.parent == null) {              // test
-   //     console.log("root");                // test
-   //     }                                   // test
-    //else console.log(node.parent.stateStr);        // test
-   // console.log("K: " + k);             // test
-    return findCycle(node.parent, k);
-}
-*/
 let reachedDFS = [];         // array containing states already reached
 
 function depthFirstSearch(puzzle, node = null) {
+    let first = false;
 // depth first search using recursion
     if (node == null) {
         node = new Node(puzzle.initial);
         reachedDFS.push(node.stateStr);
     }
-    console.log(node.stateStr);             // test
-    if (puzzle.isGoal(node.stateStr)) {    // solved, bro
+    // console.log(node.stateStr);             // test
+    if (puzzle.isGoal(node.stateStr)) {     // solved, bro
         console.log("solved");              // test
+        console.log(node.pathCost);     // test
         return node;
     }
-//  else if (isCycle(node)) return failure;
+
     else {
-        console.log("expanding");       // test
+        process.stdout.write("expanding ");       // test
+        console.log(node.stateStr);               // test
         const newNode = expand(puzzle, node);
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
-
-            if (reachedDFS.indexOf(child.stateStr) == -1) {   // if we haven't been here before
-                 reachedDFS.push(child.stateStr);               // add state to reached
-                 }
-            else {
+            if (reachedDFS.indexOf(child.stateStr) == -1) {   // if we haven't been to the child before
+                reachedDFS.push(child.stateStr);               // add state to reached
                 result = depthFirstSearch(puzzle, child);
                 if (result) return result;
             }
-        return failure;
         }
     }
 }
 
+
                    //0  1  2  3  4  5  6  7  8
-let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 0, 7, 8], 0);
+let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
@@ -207,12 +180,11 @@ let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 
 
-console.log(depthFirstSearch(p0));
+// console.log(depthFirstSearch(p0));
 
-/*
-let paths = (pathStates(breadthFirstSearch(p0)));
+
+let paths = (pathStates(depthFirstSearch(p0)));
 console.log(paths);
-*/
 
 
 
