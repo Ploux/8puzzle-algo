@@ -1,6 +1,6 @@
 // inputs: a puzzle
 // outputs: array of moves to solve puzzle, (possibly time, or # of nodes expanded etc)
-
+// There are 9!/2 = 181,400 reachable states in an 8-puzzle
 
 class Puzzle {
 /*an 8-puzzle problem */
@@ -17,7 +17,6 @@ class Puzzle {
         console.log(this.initial.slice(0,3));
         console.log(this.initial.slice(3,6));
         console.log(this.initial.slice(6));
-        console.log();
         }
 
     // The indexes of the possible squares that the blank can move to given its location
@@ -52,17 +51,13 @@ class Node {
       this.pathCost = pathCost;     // total cost of the path from initial state to this node
     }
     len() {
-        if (this.parent == null) return 0;
-        else return (1 + len(this.parent));
-    }
-    lessThan(other) {
-        return (this.pathCost < other.pathCost);
+        if (this.parent == null) return 1;
+        else return (1 + this.parent.len());
     }
     print() {                                               // print node for testing
             console.log(this.state.slice(0,3));
             console.log(this.state.slice(3,6));
             console.log(this.state.slice(6));
-            console.log();
     }
 }
 
@@ -117,50 +112,63 @@ function breadthFirstSearch(puzzle) {
     node = new Node(puzzle.initial);        // start with the initial puzzle
     console.log ("Initial puzzle: ");       // test
     node.print();                           // test
+   console.log();                              // test
     if (puzzle.isGoal(puzzle.initial)) {    // it's already solved, bro
         console.log("Already solved");      // test
         return node;
     }
     frontier = new Queue;                   // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-    console.log("Initial Frontier: ")               // test
-    frontier.print();
+//    console.log("Initial Frontier: ")               // test
+//    frontier.print();
     let reached = [JSON.stringify(puzzle.initial)];         // array containing states already reached
-    console.log("reached: ");                       // test
-    console.log(reached);                       // test
+//    console.log("reached: ");                       // test
+//    console.log(reached);                       // test
     console.log();                              // test
     while (!frontier.isEmpty()) {
         node = frontier.pop();
-        console.log ("expanding: ");            // test
-        node.print();                           // test
-        console.log ((puzzle.actions(node.state).length) + " possibilities"); // test
+//      console.log ("expanding: ");            // test
+//      node.print();                           // test
+//      console.log ((puzzle.actions(node.state).length) + " possibilities"); // test
+//      console.log();                              // test
         const newNode = expand(puzzle, node);
         for (let action in puzzle.actions(node.state)) {
             let child = newNode.next().value;
-            child.print();
+//          child.print();
+
             if (puzzle.isGoal(child.state)) {
                 console.log ("solved");         // test
+                console.log(node.len());
                 return node;
             }
             if (reached.indexOf(JSON.stringify(child.state)) == -1) {
+//              console.log("not reached");     // test
                 reached.push(JSON.stringify(child.state));
                 frontier.add(child);
-//              frontier.print();              // test
+            }
+            else {
+//                console.log("reached");     // test
             }
         }
-    return "failure";
+//        console.log();                              // test
+        console.log("reached: " + reached.length);              // test
+//        console.log(reached.length);                       // test
+        //       console.log();                              // test
+        //console.log("New Frontier: ")               // test
+        //frontier.print();                           // test
     }
+    return "failure";
 }
 
 
 
                    //0  1  2  3  4  5  6  7  8
-let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
+let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 0, 7, 8], 0);
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
 let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
 let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
-breadthFirstSearch(p1);
+breadthFirstSearch(p3);
 
