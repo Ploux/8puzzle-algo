@@ -44,12 +44,13 @@ class Puzzle {
 class Node {
 /* a node in a search tree */
 
-    constructor(state, parent = null, action = null, pathCost = 1) {
+    constructor(state, parent = null, action = null, pathCost = 1, score = 0) {
       this.state = state;           // board position in this state
+      this.stateStr = (state == null) ? "null" : JSON.stringify(state);     // string of state
       this.parent = parent;         // mommy node in the tree that generated this node
       this.action = action;         // action that was applied to mommy to generate this node
-      this.pathCost = pathCost;     // total cost of the path from initial state to this node
-      this.stateStr = (state == null) ? "null" : JSON.stringify(state);     // string of state
+      this.pathCost = pathCost;     // g(n) total cost of the path from initial state to this node
+      this.score = score;           // h(n)
     }
     print() {                                               // print node for testing
             console.log(this.state.slice(0,3));
@@ -81,19 +82,18 @@ function pathStates(node) {
 }
 
 let failure = new Node("failure", pathCost = Infinity);
+
 class Queue {
 /* FIFO queue. Used to store the frontier in breadth-first search */
     constructor() {
         this.queue = [];
+
     }
     isEmpty() {                         // returns true only if no nodes in queue
         return (this.queue.length === 0);
     }
     pop() {                             // removes top node from queue and returns it
         return (this.queue.shift());
-    }
-    top() {                             // returns (but does not remove) top node of queue
-        return (this.queue[0]);
     }
     add(node) {                         // inserts node at end of queue
         this.queue.push(node);
@@ -107,6 +107,43 @@ class Queue {
         }
     }
 }
+
+class PriorityQueue {
+    // adds the nodes with the lowest score first
+    constructor() {
+        this.queue = [];
+    }
+    isEmpty() {                         // returns true only if no nodes in queue
+        return (this.queue.length === 0);
+    }
+    pop() {                             // removes top node from queue and returns it
+        return (this.queue.shift());
+    }
+
+    top() {                             // returns (but does not remove) top node of queue
+        return (this.queue[0]);
+    }
+    add(node) {                                         // inserts node at proper location
+        let contain = false;
+        for (let i = 0; i < this.queue.length; i++) {
+            if (node.score <= this.queue[i].score) {    // lower scores are better
+                this.queue.splice(i, 0, node);          // insertion
+                break;
+            }
+            this.queue.push(node);                      // otherwise stick it in back
+        }
+    }
+    print() {                                               // print queue scores for testing
+        for (let i = 0; i < this.queue.length; i++) {
+            process.stdout.write(this.queue[i].score + " ");    // console.log without spaces
+        }
+        console.log();
+    }
+}
+
+
+
+
 
 function breadthFirstSearch(puzzle) {
 /* search shallowest nodes in the search tree first */
