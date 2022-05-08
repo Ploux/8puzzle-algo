@@ -61,7 +61,21 @@ class Node {
 }
 
 function heuristic(f, node) {
+/* 0 = no heuristic (f = g)
+   1 = a* hamming distance
+*/
     if (f == 0) return node.pathCost;
+    if (f == 1) {
+        hammingDistance = 0;
+        let goal = [1,2,3,4,5,6,7,8,0];
+        for (let i = 0; i <= 8; i++) {
+
+            if (node.state[i] != goal[i]) hammingDistance++
+        }
+        console.log(hammingDistance);   // test
+        return (node.pathCost + hammingDistance);
+    }
+
     return 0;
 }
 
@@ -84,7 +98,8 @@ function pathStates(node) {
         paths.unshift(node.state);
         node = node.parent;
     }
-    paths.unshift(node.state);      // adds the starting state
+    if (paths.length >1) paths.unshift(node.state);      // adds the starting state
+    console.log("Moves:" + (paths.length - 1));
     return paths;
 }
 
@@ -269,7 +284,9 @@ function bestFirstSearch(puzzle, f = 0) {
     return failure;
 }
 
-
+function aStarHamming(puzzle) {
+    return bestFirstSearch(puzzle, 1);
+}
 
 
 
@@ -284,10 +301,11 @@ let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 /*
 
-console.log(bestFirstSearch(p0));
-*/
+console.log(aStarHamming(p0));
 
-let paths = (pathStates(bestFirstSearch(p1)));
+*/
+let paths = (pathStates(aStarHamming(p2)));
 console.log(paths);
+
 
 
