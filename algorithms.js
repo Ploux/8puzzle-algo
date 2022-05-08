@@ -52,7 +52,8 @@ class Node {
       this.pathCost = pathCost;     // g(n) total cost of the path from initial state to this node
       this.score = score;           // h(n)
     }
-    print() {                                               // print node for testing
+    /* print node for testing */
+    print() {
             console.log(this.state.slice(0,3));
             console.log(this.state.slice(3,6));
             console.log(this.state.slice(6));
@@ -61,7 +62,6 @@ class Node {
 
 function heuristic(f, node) {
     if (f == 0) return node.pathCost;
-
     return 0;
 }
 
@@ -72,12 +72,10 @@ function* expand(puzzle, node, f = 0) {
         s1 = puzzle.result(s, puzzle.actions(s)[action]);   // the new state after we make that move
         cost = node.pathCost + 1;
         child = new Node(s1, node, action, cost);
-        child = heuristic(f, child);
+        child.score = heuristic(f, child);
         yield (child);
     }
 }
-
-
 
 function pathStates(node) {
 /* the sequence of states to get to this node */
@@ -96,7 +94,6 @@ class Queue {
 /* FIFO queue. Used to store the frontier in breadth-first search */
     constructor() {
         this.queue = [];
-
     }
     isEmpty() {                         // returns true only if no nodes in queue
         return (this.queue.length === 0);
@@ -133,19 +130,35 @@ class PriorityQueue {
         return (this.queue[0]);
     }
     add(node) {                                         // inserts node at proper location
+        let inserted = false;
+        //console.log("frontier length: " + this.queue.length);                 // test
         for (let i = 0; i < this.queue.length; i++) {
             if (node.score <= this.queue[i].score) {    // lower scores are better
                 this.queue.splice(i, 0, node);          // insertion
+          //      console.log("inserting");               // test
+                inserted = true;
                 break;
             }
-            this.queue.push(node);                      // otherwise stick it in back
         }
+        if (!inserted) this.queue.push(node);                      // otherwise stick it in back
+        //console.log("pushing");                     // test
+        //console.log("frontier length: " + this.queue.length);                 // test
     }
-    print() {                                               // print queue scores for testing
+    /* print queue scores for testing*/
+    printScores() {
         for (let i = 0; i < this.queue.length; i++) {
             process.stdout.write(this.queue[i].score + " ");    // console.log without spaces
         }
         console.log();
+    }
+    /* print queue for testing */
+    print() {
+        for (let i = 0; i < this.queue.length; i++) {
+            console.log(this.queue[i].state.slice(0,3));
+            console.log(this.queue[i].state.slice(3,6));
+            console.log(this.queue[i].state.slice(6));
+            console.log();
+        }
     }
 }
 
@@ -153,7 +166,7 @@ function breadthFirstSearch(puzzle) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
     if (puzzle.isGoal(puzzle.initialStr)) {    // it's already solved, bro
-        console.log(0);     // test
+        // console.log(0);     // test
         return node;
     }
     frontier = new Queue;                   // a new frontier
@@ -165,8 +178,8 @@ function breadthFirstSearch(puzzle) {
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
             if (puzzle.isGoal(child.stateStr)) {               // finish as soon as we find a winner
-                console.log ("solved");         // test
-                console.log(node.pathCost);     // test
+                //console.log ("solved");         // test
+                //console.log(node.pathCost);     // test
                 return node;
             }
             if (reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
@@ -174,7 +187,7 @@ function breadthFirstSearch(puzzle) {
                 frontier.add(child);                                    // add child to frontier
             }
         }
-        console.log("reached: " + reached.length);              // test
+        // console.log("reached: " + reached.length);              // test
     }
     return failure;
 }
@@ -190,14 +203,14 @@ function depthFirstSearch(puzzle, node = null) {
     }
     // console.log(node.stateStr);             // test
     if (puzzle.isGoal(node.stateStr)) {     // solved, bro
-        console.log("solved");              // test
-        console.log(node.pathCost);     // test
+        //console.log("solved");              // test
+        //console.log(node.pathCost);     // test
         return node;
     }
 
     else {
-        process.stdout.write("expanding ");       // test
-        console.log(node.stateStr);               // test
+        //process.stdout.write("expanding ");       // test
+        //console.log(node.stateStr);               // test
         const newNode = expand(puzzle, node);
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
@@ -213,21 +226,29 @@ function depthFirstSearch(puzzle, node = null) {
 function bestFirstSearch(puzzle, f = 0) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
+    //console.log("Initial Puzzle");           // test
+    //node.print();                           // test
+
     frontier = new PriorityQueue;           // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
+    //console.log("Initial Frontier");        // test
+    //frontier.print();                       // test
+   // frontier.printScores();                 // test
     let reached = [puzzle.stateStr];         // array containing states already reached and their scores
-    if (puzzle.isGoal(puzzle.initialStr)) {    // it's already solved, bro
-        console.log(0);     // test
+    if (puzzle.isGoal(puzzle.initialStr)) {    // check that that the puzzle isn't already solved
+        //console.log("it's already solved, bro");     // test
         return node;
     }
     while (!frontier.isEmpty()) {
+        //console.log("popping node");                // test
         node = frontier.pop();                              // take the node with the lowest score
+        //node.print();                                   // test
         const newNode = expand(puzzle, node, f);               // create newNode to hold what comes out of generator
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
             if (puzzle.isGoal(child.stateStr)) {               // finish as soon as we find a winner
-                console.log ("solved");         // test
-                console.log(node.pathCost);     // test
+               // console.log ("solved");         // test
+                //console.log(node.pathCost);     // test
                 return node;
             }
             if (reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
@@ -261,12 +282,12 @@ let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
 let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 
+/*
 
 console.log(bestFirstSearch(p0));
-
-/*
-let paths = (pathStates(bestFirstSearch(p0)));
-console.log(paths);
 */
+
+let paths = (pathStates(bestFirstSearch(p1)));
+console.log(paths);
 
 
