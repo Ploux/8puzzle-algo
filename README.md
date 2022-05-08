@@ -4,6 +4,7 @@ Javascript algorithms for solving an 8-puzzle
 [Visualization](https://tristanpenman.com/demos/n-puzzle/)
 
 ## Python version
+
 **Moves per Algorithm**
 
 | **Algorithm**                   | **e1** | **e2** | **e3** | **e4** | **e5** |

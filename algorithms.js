@@ -28,8 +28,8 @@ class Puzzle {
 
     // result (swap the blank with the action square)
     result(state, action) {
-        const s = [...state]
-        let blank = s.indexOf(0);                                   // find the blank
+        const s = [...state]                            // very important line - otherwise we modify the state
+        let blank = s.indexOf(0);                       // find the blank
         [s[action], s[blank]] = [s[blank], s[action]];  // swap
         return s;
     }
@@ -50,7 +50,7 @@ class Node {
       this.action = action;         // action that was applied to mommy to generate this node
       this.pathCost = pathCost;     // total cost of the path from initial state to this node
     }
-    len() {
+    len() {                                                 // how many moves it took to get here
         if (this.parent == null) return 1;
         else return (1 + this.parent.len());
     }
@@ -78,6 +78,8 @@ function* expand(puzzle, node) {
         yield (node1);
     }
 }
+
+
 
 
 class Queue {
