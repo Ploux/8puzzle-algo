@@ -115,7 +115,9 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             return (node.pathCost + manhattanDist);
             break;
 
-    case 3: return -(node.pathCost);
+    case 3:
+            // console.log(-node.pathCost);
+            return (-node.pathCost);
             break;
 
     default: return 0;
@@ -130,10 +132,10 @@ function* expand(puzzle, node, f = 0, depth) {
         cost = node.pathCost + 1;
         child = new Node(s1, node, action, cost);
         child.score = heuristic(f, child);
-        console.log(depth + " " + cost);
+        console.log(depth + " " + cost);    // test
         if (depth != 0 && cost > depth) {
             child = cutoff;
-            console.log("cutoff!");
+            console.log("cutoff!");  // test
         }
         yield (child);
     }
@@ -239,10 +241,11 @@ function bestFirstSearch(puzzle, f = 0, depth = 0) {
                 //console.log(node.pathCost);     // test
                 return node;
             }
-            if (node == cutoff) console.log("it's cutoff time");
-            if (node != cutoff && reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
+            if (child == cutoff) console.log("it's cutoff time");
+            if (child != cutoff && reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
                 reached.push(child.stateStr);              // add state to reached
                 frontier.add(child);                         // add child to frontier
+                frontier.printScores();
             }
             else {
                 for (let i = 0; i < frontier.length; i++) {
@@ -274,10 +277,18 @@ function depthBFS(puzzle) {
     return bestFirstSearch(puzzle, 3);
 }
 
-function depthLimitedBFS(puzzle) {
-    return bestFirstSearch(puzzle, 3, 30);
+function depthLimitedBFS(puzzle, depth=30) {
+    return bestFirstSearch(puzzle, 3, depth);
 }
 
+function iterativeDeepeningBFS(puzzle) {
+    let depth = 1;
+    while (true) {
+        let result = depthLimitedBFS(puzzle, 3, depth);
+        if (result != cutoff) return result;
+        depth++;
+    }
+}
 
 
                    //0  1  2  3  4  5  6  7  8
@@ -300,6 +311,7 @@ let p23 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p31 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 /*
+console.log(iterativeDeepeningBFS(p2));
 console.log(aStarManhattan(p7));
 
 
@@ -308,7 +320,8 @@ let paths = (pathStates(aStarManhattan(p23)));
 let paths = (pathStates(depthBFS(p7)));
 let paths = (pathStates(breadthBFS(p20)));
 let paths = (pathStates(breadthFirstSearch(p7)));
-*/
 
-let paths = (pathStates(depthLimitedBFS(p20)));
+let paths = (pathStates(iterativeDeepeningBFS(p4)));
+*/
+let paths = (pathStates(depthLimitedBFS(p20, 21)));
 console.log(paths);
