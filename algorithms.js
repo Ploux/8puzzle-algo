@@ -2,6 +2,15 @@
 // outputs: array of moves to solve puzzle, (possibly time, or # of nodes expanded etc)
 // There are 9!/2 = 181,400 reachable states in an 8-puzzle
 
+/* todo
+add dfs limited
+add iterative
+fix dfsrecursive failure
+add more a*
+move reached to global and delete dfsreached or del dfs recursive
+fix wrapper ie where to specify puzzle depth
+*/
+
 class Puzzle {
 /*an 8-puzzle problem */
 
@@ -93,8 +102,7 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             console.log();
             for (let i = 0; i <= 8; i++) {
                 let tile = node.state[i];
-                // let tilePos = tileX[i] + tileY[i];
-                // let goalPos = goalX[tile] + goalY[tile];
+                /* tests */
                 console.log("tile: " + tile);
                 console.log("pos: " + tileX[i] + " " + tileY[i]);
                 console.log("goal: " + goalX[tile] + " " + goalY[tile]);
@@ -104,11 +112,6 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             }
             console.log(node.stateStr);     // test
             console.log("Manhattan Distance: " + manhattanDist); // test
-            /*
-          //  if (node.parent.stateStr == "[4,1,2,5,0,3,7,8,6]") {  // test
-                console.log();  // test
-         //    }                // test
-            */
             return (node.pathCost + manhattanDist);
             break;
 
@@ -119,7 +122,7 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
     }
 }
 
-function* expand(puzzle, node, f = 0) {
+function* expand(puzzle, node, f = 0, depth) {
 /* expand a node, generating the child nodes */
     let s = [...node.state];
     for (let action in puzzle.actions(s)) {                 // 1-3 possible moves
@@ -127,6 +130,11 @@ function* expand(puzzle, node, f = 0) {
         cost = node.pathCost + 1;
         child = new Node(s1, node, action, cost);
         child.score = heuristic(f, child);
+        console.log(depth + " " + cost);
+        if (depth != 0 && cost > depth) {
+            child = cutoff;
+            console.log("cutoff!");
+        }
         yield (child);
     }
 }
@@ -151,11 +159,12 @@ function pathStates(node) {
 }
 
 let failure = new Node("failure", pathCost = Infinity);
+let cutoff = new Node("cutoff", pathCost = Infinity);
 
 
 
 class Queue {
-    // a queue that can be a FIFO or priority
+    // a queue that can be a FIFO, LIFO, or priority
     constructor() {
         this.queue = [];
     }
@@ -201,70 +210,10 @@ class Queue {
     }
 }
 
-function breadthFirstSearch(puzzle) {
+function bestFirstSearch(puzzle, f = 0, depth = 0) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
-    if (puzzle.isGoal(puzzle.initialStr)) {    // it's already solved, bro
-        // console.log(0);     // test
-        return node;
-    }
-    frontier = new Queue;                   // a new frontier
-    frontier.add(node);                     // put the initial puzzle in the frontier queue
-    let reached = [puzzle.stateStr];         // array containing states already reached
-    while (!frontier.isEmpty()) {
-        node = frontier.pop();                              // take the node that's been in there the longest
-        const newNode = expand(puzzle, node);               // create newNode to hold what comes out of generator
-        for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
-            let child = newNode.next().value;               // generate!
-            if (puzzle.isGoal(child.stateStr)) {               // finish as soon as we find a winner
-                //console.log ("solved");         // test
-                //console.log(node.pathCost);     // test
-                return node;
-            }
-            if (reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
-                reached.push(child.stateStr);              // add state to reached
-                frontier.push(child);                                    // add child to frontier
-            }
-        }
-        // console.log("reached: " + reached.length);              // test
-    }
-    return failure;
-}
-
-let reachedDFS = [];         // array containing states already reached
-
-function depthFirstSearch(puzzle, node = null) {
-    let first = false;
-// depth first search using recursion
-    if (node == null) {
-        node = new Node(puzzle.initial);
-        reachedDFS.push(node.stateStr);
-    }
-    // console.log(node.stateStr);             // test
-    if (puzzle.isGoal(node.stateStr)) {     // solved, bro
-        //console.log("solved");              // test
-        //console.log(node.pathCost);     // test
-        return node;
-    }
-
-    else {
-        //process.stdout.write("expanding ");       // test
-        //console.log(node.stateStr);               // test
-        const newNode = expand(puzzle, node);
-        for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
-            let child = newNode.next().value;               // generate!
-            if (reachedDFS.indexOf(child.stateStr) == -1) {   // if we haven't been to the child before
-                reachedDFS.push(child.stateStr);               // add state to reached
-                result = depthFirstSearch(puzzle, child);
-                if (result) return result;
-            }
-        }
-    }
-}
-
-function bestFirstSearch(puzzle, f = 0) {
-/* search shallowest nodes in the search tree first */
-    node = new Node(puzzle.initial);        // start with the initial puzzle
+    // console.log(depth);                  // test
     // console.log("Initial Puzzle");           // test
     // node.print();                           // test
 
@@ -282,7 +231,7 @@ function bestFirstSearch(puzzle, f = 0) {
         //console.log("popping node");                // test
         node = frontier.pop();                              // take the node with the lowest score
         //node.print();                                   // test
-        const newNode = expand(puzzle, node, f);               // create newNode to hold what comes out of generator
+        const newNode = expand(puzzle, node, f, depth);               // create newNode to hold what comes out of generator
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
             if (puzzle.isGoal(child.stateStr)) {               // finish as soon as we find a winner
@@ -290,7 +239,8 @@ function bestFirstSearch(puzzle, f = 0) {
                 //console.log(node.pathCost);     // test
                 return node;
             }
-            if (reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
+            if (node == cutoff) console.log("it's cutoff time");
+            if (node != cutoff && reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
                 reached.push(child.stateStr);              // add state to reached
                 frontier.add(child);                         // add child to frontier
             }
@@ -306,7 +256,7 @@ function bestFirstSearch(puzzle, f = 0) {
         }
         // console.log("reached: " + reached.length);              // test
     }
-    return failure;
+    return cutoff;
 }
 function breadthBFS(puzzle) {
     return bestFirstSearch(puzzle, 0);
@@ -323,6 +273,12 @@ function aStarManhattan(puzzle) {
 function depthBFS(puzzle) {
     return bestFirstSearch(puzzle, 3);
 }
+
+function depthLimitedBFS(puzzle) {
+    return bestFirstSearch(puzzle, 3, 30);
+}
+
+
 
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
@@ -351,7 +307,8 @@ let paths = (pathStates(aStarHamming(p23)));
 let paths = (pathStates(aStarManhattan(p23)));
 let paths = (pathStates(depthBFS(p7)));
 let paths = (pathStates(breadthBFS(p20)));
+let paths = (pathStates(breadthFirstSearch(p7)));
 */
 
-let paths = (pathStates(breadthFirstSearch(p7)));
+let paths = (pathStates(depthLimitedBFS(p20)));
 console.log(paths);
