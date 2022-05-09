@@ -3,8 +3,9 @@
 // There are 9!/2 = 181,400 reachable states in an 8-puzzle
 
 /* todo
-try to figure out bugs in a* swaps
 fix wrapper ie where to specify puzzle depth
+clean up code - remove test cases
+try to figure out bugs in a* swaps
 */
 
 class Puzzle {
