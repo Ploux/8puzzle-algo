@@ -132,10 +132,10 @@ function* expand(puzzle, node, f = 0, depth) {
         cost = node.pathCost + 1;
         child = new Node(s1, node, action, cost);
         child.score = heuristic(f, child);
-        console.log(depth + " " + cost);    // test
+        // console.log(depth + " " + cost);    // test
         if (depth != 0 && cost > depth) {
             child = cutoff;
-            console.log("cutoff!");  // test
+            // console.log("cutoff!");  // test
         }
         yield (child);
     }
@@ -241,11 +241,11 @@ function bestFirstSearch(puzzle, f = 0, depth = 0) {
                 //console.log(node.pathCost);     // test
                 return node;
             }
-            if (child == cutoff) console.log("it's cutoff time");
+            // if (child == cutoff) console.log("it's cutoff time");    // test
             if (child != cutoff && reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
                 reached.push(child.stateStr);              // add state to reached
                 frontier.add(child);                         // add child to frontier
-                frontier.printScores();
+                //  frontier.printScores();                 // test
             }
             else {
                 for (let i = 0; i < frontier.length; i++) {
@@ -284,8 +284,12 @@ function depthLimitedBFS(puzzle, depth=30) {
 function iterativeDeepeningBFS(puzzle) {
     let depth = 1;
     while (true) {
-        let result = depthLimitedBFS(puzzle, 3, depth);
-        if (result != cutoff) return result;
+        console.log(depth);
+        let result = depthLimitedBFS(puzzle, depth);
+        if (result != cutoff)
+            {
+                return result;
+            }
         depth++;
     }
 }
@@ -321,7 +325,7 @@ let paths = (pathStates(depthBFS(p7)));
 let paths = (pathStates(breadthBFS(p20)));
 let paths = (pathStates(breadthFirstSearch(p7)));
 
-let paths = (pathStates(iterativeDeepeningBFS(p4)));
-*/
 let paths = (pathStates(depthLimitedBFS(p20, 21)));
+*/
+let paths = (pathStates(iterativeDeepeningBFS(p20)));
 console.log(paths);
