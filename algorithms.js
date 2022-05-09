@@ -94,9 +94,12 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
                 let goalPos = goalX[tile] + goalY[tile];
                 manhattanDist += Math.abs(tilePos - goalPos);
             }
-            console.log(manhattanDist); // test
-            console.log();  // test
-            return manhattanDist;
+            console.log(node.stateStr);     // test
+          //  if (node.parent.stateStr == "[4,1,2,5,0,3,7,8,6]") {  // test
+                console.log(manhattanDist); // test
+                console.log();  // test
+         //    }                // test
+            return (node.pathCost + manhattanDist);
             break;
     default: return 0;
     }
@@ -335,12 +338,26 @@ function aStarManhattan(puzzle) {
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p1 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 0, 7, 8], 0);
-let p23 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
+let p3 = new Puzzle([1, 2, 3, 0, 5, 6, 4, 7, 8], 0);
+let p4 = new Puzzle([0, 2, 3, 1, 5, 6, 4, 7, 8], 0);
+
+/*
+023
+156
+478
+
+*/
+
 let p7 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
 let p20 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
+let p23 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p31 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
-// console.log(aStarManhattan(p0));
+/*
+console.log(aStarManhattan(p7));
 
+let paths = (pathStates(breadthFirstSearch(p7)));
+
+*/
 let paths = (pathStates(aStarManhattan(p7)));
 console.log(paths);
