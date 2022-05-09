@@ -62,9 +62,10 @@ class Node {
 }
 
 function heuristic(f, node) {
-/* 0 = no heuristic (f = g)
+/* 0 = breadth-first
    1 = a* hamming distance
    2 = a* manhattan distance
+   3 = depth-first
 */
     switch (f) {
     case 0: return node.pathCost;
@@ -110,6 +111,10 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             */
             return (node.pathCost + manhattanDist);
             break;
+
+    case 3: return -(node.pathCost);
+            break;
+
     default: return 0;
     }
 }
@@ -147,8 +152,10 @@ function pathStates(node) {
 
 let failure = new Node("failure", pathCost = Infinity);
 
+
+
 class Queue {
-/* FIFO queue. Used to store the frontier in breadth-first search */
+    // a queue that can be a FIFO or priority
     constructor() {
         this.queue = [];
     }
@@ -158,33 +165,8 @@ class Queue {
     pop() {                             // removes top node from queue and returns it
         return (this.queue.shift());
     }
-    add(node) {                         // inserts node at end of queue
+    push(node) {                         // inserts node at end of queue
         this.queue.push(node);
-    }
-    print() {                                               // print queue for testing
-        for (let i = 0; i < this.queue.length; i++) {
-            console.log(this.queue[i].state.slice(0,3));
-            console.log(this.queue[i].state.slice(3,6));
-            console.log(this.queue[i].state.slice(6));
-            console.log();
-        }
-    }
-}
-
-class PriorityQueue {
-    // adds the nodes with the lowest score first
-    constructor() {
-        this.queue = [];
-    }
-    isEmpty() {                         // returns true only if no nodes in queue
-        return (this.queue.length === 0);
-    }
-    pop() {                             // removes top node from queue and returns it
-        return (this.queue.shift());
-    }
-
-    top() {                             // returns (but does not remove) top node of queue
-        return (this.queue[0]);
     }
     add(node) {                                         // inserts node at proper location
         let inserted = false;
@@ -241,7 +223,7 @@ function breadthFirstSearch(puzzle) {
             }
             if (reached.indexOf(child.stateStr) == -1) {   // if we haven't been here before
                 reached.push(child.stateStr);              // add state to reached
-                frontier.add(child);                                    // add child to frontier
+                frontier.push(child);                                    // add child to frontier
             }
         }
         // console.log("reached: " + reached.length);              // test
@@ -286,7 +268,7 @@ function bestFirstSearch(puzzle, f = 0) {
     // console.log("Initial Puzzle");           // test
     // node.print();                           // test
 
-    frontier = new PriorityQueue;           // a new frontier
+    frontier = new Queue;           // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
     // console.log("Initial Frontier");        // test
     // frontier.print();                       // test
@@ -338,6 +320,10 @@ function aStarManhattan(puzzle) {
     return bestFirstSearch(puzzle, 2);
 }
 
+function depthBFS(puzzle) {
+    return bestFirstSearch(puzzle, 3);
+}
+
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p1 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
@@ -362,8 +348,10 @@ console.log(aStarManhattan(p7));
 
 
 let paths = (pathStates(aStarHamming(p23)));
-let paths = (pathStates(breadthFirstSearch(p23)));
 let paths = (pathStates(aStarManhattan(p23)));
-*/
+let paths = (pathStates(depthBFS(p7)));
 let paths = (pathStates(breadthBFS(p20)));
+*/
+
+let paths = (pathStates(breadthFirstSearch(p7)));
 console.log(paths);
