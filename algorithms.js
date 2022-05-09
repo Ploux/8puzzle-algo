@@ -3,8 +3,7 @@
 // There are 9!/2 = 181,400 reachable states in an 8-puzzle
 
 /* todo
-fix dfsrecursive failure
-add more a*
+try to figure out bugs in a* swaps
 fix wrapper ie where to specify puzzle depth
 */
 
@@ -74,6 +73,7 @@ function heuristic(f, node) {
    3 = depth-first variants
    4 = a* euclidean distance
    5 = a* n-MaxSwap
+   6 = a* n-Swap
 
 */
     switch (f) {
@@ -160,7 +160,24 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
                     }
                 }
             }
-            return (node.pathCost + swaps - 1);
+            return (node.pathCost + swaps);
+            break;
+
+    case 6: let switches = 0;
+            let B = [...node.state];
+            let zeroth = B.findIndex(elem => elem == 0);
+            B[zeroth] = 9;
+            // console.log(B);
+            for (let i = 0; i <= 8; i++) {
+                if (B[i] != i+1)
+                    {
+                        let num = B.findIndex(elem => elem == i+1);
+                        [B[i], B[num]] = [B[num], B[i]];
+                        switches++;
+                    }
+            }
+            // console.log(switches);
+            return (node.pathCost+switches);
             break;
 
     default: return 0;
@@ -346,6 +363,10 @@ function aStarEuclid(puzzle) {
 function aStarNMaxSwap(puzzle) {
     return bestFirstSearch(puzzle, 5);
 }
+
+function aStarNSwap(puzzle) {
+    return bestFirstSearch(puzzle, 6);
+}
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p1 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
@@ -379,6 +400,7 @@ let paths = (pathStates(breadthFirstSearch(p7)));
 let paths = (pathStates(depthLimitedBFS(p20, 21)));
 let paths = (pathStates(iterativeDeepeningBFS(p20)));
 let paths = (pathStates(aStarEuclid(p31)));
+let paths = (pathStates(aStarNSwap(p31)));
 */
-let paths = (pathStates(aStarNMaxSwap(p23)));
+let paths = (pathStates(aStarNMaxSwap(p20)));
 console.log(paths);
