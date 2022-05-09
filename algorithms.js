@@ -73,13 +73,14 @@ function heuristic(f, node) {
    2 = a* manhattan distance
    3 = depth-first variants
    4 = a* euclidean distance
+   5 = a* n-MaxSwap
 
 */
     switch (f) {
     case 0: return node.pathCost;
             break;
 
-    case 1: hammingDist = 0;
+    case 1: let hammingDist = 0;
             let goal = [1,2,3,4,5,6,7,8,0];
             for (let i = 0; i <= 8; i++) {
                 if (node.state[i] != goal[i]) hammingDist++;
@@ -92,7 +93,7 @@ let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
 let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 */
 
-    case 2: manhattanDist = 0;
+    case 2: let manhattanDist = 0;
 
             node.print();
             console.log();
@@ -116,7 +117,7 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             return (-node.pathCost);
             break;
 
-    case 4: euclidDist = 0;
+    case 4: let euclidDist = 0;
             // node.print();
             // console.log();
             for (let i = 0; i <= 8; i++) {
@@ -134,6 +135,34 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             console.log("Euclidean Distance: " + euclidDist); // test
             return (node.pathCost + euclidDist);
             break;
+
+    case 5: let swaps = 0;
+            let P = [...node.state];
+            let zero = P.findIndex(elem => elem == 0);
+            P[zero] = 9;
+            // console.log(P);
+
+            for (let i = 0; i <= 8; i++) {
+                if (P[i] != i + 1) {
+                    let nine = P.findIndex(elem => elem == 9);
+                    if (i != nine) {
+                        swaps++;
+                        //console.log(swaps);
+                        [P[i], P[nine]] = [P[nine], P[i]];
+                        //console.log(P);
+                    }
+                    let num = P.findIndex(elem => elem == i+1);
+                    if (i != num) {
+                        swaps++;
+                        //console.log(swaps);
+                        [P[i], P[num]] = [P[num], P[i]];
+                        //console.log(P);
+                    }
+                }
+            }
+            return (node.pathCost + swaps - 1);
+            break;
+
     default: return 0;
     }
 }
@@ -314,6 +343,9 @@ function iterativeDeepeningBFS(puzzle) {
 function aStarEuclid(puzzle) {
     return bestFirstSearch(puzzle, 4);
 }
+function aStarNMaxSwap(puzzle) {
+    return bestFirstSearch(puzzle, 5);
+}
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p1 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
@@ -346,6 +378,7 @@ let paths = (pathStates(breadthFirstSearch(p7)));
 
 let paths = (pathStates(depthLimitedBFS(p20, 21)));
 let paths = (pathStates(iterativeDeepeningBFS(p20)));
-*/
 let paths = (pathStates(aStarEuclid(p31)));
+*/
+let paths = (pathStates(aStarNMaxSwap(p23)));
 console.log(paths);
