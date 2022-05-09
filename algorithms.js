@@ -3,11 +3,8 @@
 // There are 9!/2 = 181,400 reachable states in an 8-puzzle
 
 /* todo
-add dfs limited
-add iterative
 fix dfsrecursive failure
 add more a*
-move reached to global and delete dfsreached or del dfs recursive
 fix wrapper ie where to specify puzzle depth
 */
 
@@ -74,7 +71,9 @@ function heuristic(f, node) {
 /* 0 = breadth-first
    1 = a* hamming distance
    2 = a* manhattan distance
-   3 = depth-first
+   3 = depth-first variants
+   4 = a* euclidean distance
+
 */
     switch (f) {
     case 0: return node.pathCost;
@@ -94,10 +93,7 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 */
 
     case 2: manhattanDist = 0;
-            let goalX = [2, 0, 1, 2, 0, 1, 2, 0, 1];
-            let goalY = [2, 0, 0, 0, 1, 1, 1, 2, 2];
-            let tileX = [0, 1, 2, 0, 1, 2, 0, 1, 2];
-            let tileY = [0, 0, 0, 1, 1, 1, 2, 2, 2];
+
             node.print();
             console.log();
             for (let i = 0; i <= 8; i++) {
@@ -120,6 +116,24 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             return (-node.pathCost);
             break;
 
+    case 4: euclidDist = 0;
+            // node.print();
+            // console.log();
+            for (let i = 0; i <= 8; i++) {
+                let tile = node.state[i];
+                /* tests
+                console.log("tile: " + tile);
+                console.log("pos: " + tileX[i] + " " + tileY[i]);
+                console.log("goal: " + goalX[tile] + " " + goalY[tile]);
+                */
+                let ed = Math.sqrt((tileX[i]- goalX[tile])**2 + (tileY[i]- goalY[tile])**2)
+                // console.log(ed);
+                euclidDist += ed;
+            }
+            console.log(node.stateStr);     // test
+            console.log("Euclidean Distance: " + euclidDist); // test
+            return (node.pathCost + euclidDist);
+            break;
     default: return 0;
     }
 }
@@ -162,7 +176,10 @@ function pathStates(node) {
 
 let failure = new Node("failure", pathCost = Infinity);
 let cutoff = new Node("cutoff", pathCost = Infinity);
-
+let goalX = [2, 0, 1, 2, 0, 1, 2, 0, 1];
+let goalY = [2, 0, 0, 0, 1, 1, 1, 2, 2];
+let tileX = [0, 1, 2, 0, 1, 2, 0, 1, 2];
+let tileY = [0, 0, 0, 1, 1, 1, 2, 2, 2];
 
 
 class Queue {
@@ -294,7 +311,9 @@ function iterativeDeepeningBFS(puzzle) {
     }
 }
 
-
+function aStarEuclid(puzzle) {
+    return bestFirstSearch(puzzle, 4);
+}
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p1 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
@@ -326,6 +345,7 @@ let paths = (pathStates(breadthBFS(p20)));
 let paths = (pathStates(breadthFirstSearch(p7)));
 
 let paths = (pathStates(depthLimitedBFS(p20, 21)));
-*/
 let paths = (pathStates(iterativeDeepeningBFS(p20)));
+*/
+let paths = (pathStates(aStarEuclid(p31)));
 console.log(paths);
