@@ -326,6 +326,9 @@ function bestFirstSearch(puzzle, f = 0) {
     }
     return failure;
 }
+function breadthBFS(puzzle) {
+    return bestFirstSearch(puzzle, 0);
+}
 
 function aStarHamming(puzzle) {
     return bestFirstSearch(puzzle, 1);
@@ -360,6 +363,7 @@ console.log(aStarManhattan(p7));
 
 let paths = (pathStates(aStarHamming(p23)));
 let paths = (pathStates(breadthFirstSearch(p23)));
-*/
 let paths = (pathStates(aStarManhattan(p23)));
+*/
+let paths = (pathStates(breadthBFS(p20)));
 console.log(paths);
