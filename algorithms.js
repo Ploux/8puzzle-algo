@@ -44,7 +44,7 @@ class Puzzle {
 class Node {
 /* a node in a search tree */
 
-    constructor(state, parent = null, action = null, pathCost = 1, score = 0) {
+    constructor(state, parent = null, action = null, pathCost = 0, score = 0) {
       this.state = state;           // board position in this state
       this.stateStr = (state == null) ? "null" : JSON.stringify(state);     // string of state
       this.parent = parent;         // mommy node in the tree that generated this node
@@ -95,6 +95,7 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
                 manhattanDist += Math.abs(tilePos - goalPos);
             }
             console.log(manhattanDist); // test
+            console.log();  // test
             return manhattanDist;
             break;
     default: return 0;
@@ -116,13 +117,37 @@ function* expand(puzzle, node, f = 0) {
 function pathStates(node) {
 /* the sequence of states to get to this node */
     let paths = [[1, 2, 3, 4, 5, 6, 7, 8, 0]];      // make [] if you don't want the starting state in the array
+
+
+    if (node.stateStr == "[1,2,3,4,5,6,7,8,0]" ) {
+         console.log("Moves: 0");
+         return paths;
+    }
+    else if (node.pathCost == 0) {
+         console.log("Moves: 1");
+         paths.unshift(node.state);
+         return paths;
+    }
+    else {
+        console.log("Moves: " + (node.pathCost + 1));
+        while (node.parent != null) {
+            paths.unshift(node.state);
+            node = node.parent;
+        }
+        paths.unshift(node.state);
+        return paths;
+    }
+
+    /*
+         console.log("Moves: " + (node.pathCost + 1));
     while (node.parent != null) {
         paths.unshift(node.state);
         node = node.parent;
     }
     if (paths.length > 1) paths.unshift(node.state);      // adds the final state if we didn't start at goal
-    console.log("Moves: " + (paths.length - 1));
+    // console.log("Moves: " + (paths.length - 1));
     return paths;
+    */
 }
 
 let failure = new Node("failure", pathCost = Infinity);
@@ -263,14 +288,14 @@ function depthFirstSearch(puzzle, node = null) {
 function bestFirstSearch(puzzle, f = 0) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
-    //console.log("Initial Puzzle");           // test
-    //node.print();                           // test
+    console.log("Initial Puzzle");           // test
+    node.print();                           // test
 
     frontier = new PriorityQueue;           // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-    //console.log("Initial Frontier");        // test
-    //frontier.print();                       // test
-   // frontier.printScores();                 // test
+    console.log("Initial Frontier");        // test
+    frontier.print();                       // test
+    // frontier.printScores();                 // test
     let reached = [puzzle.stateStr];         // array containing states already reached and their scores
     if (puzzle.isGoal(puzzle.initialStr)) {    // check that that the puzzle isn't already solved
         //console.log("it's already solved, bro");     // test
@@ -318,9 +343,10 @@ function aStarManhattan(puzzle) {
 
 
                    //0  1  2  3  4  5  6  7  8
-let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
-let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
-let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
+let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
+let p1 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
+let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 0, 7, 8], 0);
+let p23 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
 let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
 let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
 let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
@@ -329,5 +355,5 @@ let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 // console.log(aStarManhattan(p0));
 
-let paths = (pathStates(aStarManhattan(p3)));
+let paths = (pathStates(aStarHamming(p2)));
 console.log(paths);
