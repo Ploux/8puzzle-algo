@@ -118,36 +118,27 @@ function pathStates(node) {
 /* the sequence of states to get to this node */
     let paths = [[1, 2, 3, 4, 5, 6, 7, 8, 0]];      // make [] if you don't want the starting state in the array
 
-
     if (node.stateStr == "[1,2,3,4,5,6,7,8,0]" ) {
-         console.log("Moves: 0");
-         return paths;
+        // console.log("Moves: 0");
+        console.log("Puzzle already solved");
     }
+/*
     else if (node.pathCost == 0) {
-         console.log("Moves: 1");
+         // console.log("Moves: 1");
          paths.unshift(node.state);
-         return paths;
     }
+*/
     else {
-        console.log("Moves: " + (node.pathCost + 1));
+        // console.log("Moves: " + (node.pathCost + 1));
         while (node.parent != null) {
             paths.unshift(node.state);
             node = node.parent;
         }
         paths.unshift(node.state);
-        return paths;
     }
-
-    /*
-         console.log("Moves: " + (node.pathCost + 1));
-    while (node.parent != null) {
-        paths.unshift(node.state);
-        node = node.parent;
-    }
-    if (paths.length > 1) paths.unshift(node.state);      // adds the final state if we didn't start at goal
-    // console.log("Moves: " + (paths.length - 1));
+    console.log ("Moves: " + (paths.length - 1));
     return paths;
-    */
+
 }
 
 let failure = new Node("failure", pathCost = Infinity);
@@ -298,13 +289,13 @@ function bestFirstSearch(puzzle, f = 0) {
     // frontier.printScores();                 // test
     let reached = [puzzle.stateStr];         // array containing states already reached and their scores
     if (puzzle.isGoal(puzzle.initialStr)) {    // check that that the puzzle isn't already solved
-        //console.log("it's already solved, bro");     // test
+        console.log("it's already solved, bro");     // test
         return node;
     }
     while (!frontier.isEmpty()) {
-        //console.log("popping node");                // test
+        console.log("popping node");                // test
         node = frontier.pop();                              // take the node with the lowest score
-        //node.print();                                   // test
+        node.print();                                   // test
         const newNode = expand(puzzle, node, f);               // create newNode to hold what comes out of generator
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
@@ -340,20 +331,16 @@ function aStarManhattan(puzzle) {
     return bestFirstSearch(puzzle, 2);
 }
 
-
-
                    //0  1  2  3  4  5  6  7  8
 let p0 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 8, 0], 0);
 let p1 = new Puzzle([1, 2, 3, 4, 5, 6, 7, 0, 8], 0);
 let p2 = new Puzzle([1, 2, 3, 4, 5, 6, 0, 7, 8], 0);
 let p23 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
-let p3 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
-let p4 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
-let p5 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
-
-
+let p7 = new Puzzle([4, 0, 2, 5, 1, 3, 7, 8, 6], 0);
+let p20 = new Puzzle([7, 2, 4, 5, 0, 6, 8, 3, 1], 0);
+let p31 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 
 // console.log(aStarManhattan(p0));
 
-let paths = (pathStates(aStarHamming(p2)));
+let paths = (pathStates(aStarManhattan(p7)));
 console.log(paths);
