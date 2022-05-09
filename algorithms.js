@@ -11,6 +11,7 @@ class Puzzle {
         this.algo = algo;       // integer specifying algorithm to use
         this.depth = depth;     // max depth if depth-limited is chosen
         this.goal = "[1,2,3,4,5,6,7,8,0]";
+        // this.goal =  '[1,0,2,7,4,5,3,6,8]'; // testing
     }
 
     // display board
@@ -87,18 +88,26 @@ let p1 = new Puzzle([1, 4, 2, 0, 7, 5, 3, 6, 8], 0);
             let goalY = [2, 0, 0, 0, 1, 1, 1, 2, 2];
             let tileX = [0, 1, 2, 0, 1, 2, 0, 1, 2];
             let tileY = [0, 0, 0, 1, 1, 1, 2, 2, 2];
-
+            node.print();
+            console.log();
             for (let i = 0; i <= 8; i++) {
                 let tile = node.state[i];
-                let tilePos = tileX[i] + tileY[i];
-                let goalPos = goalX[tile] + goalY[tile];
-                manhattanDist += Math.abs(tilePos - goalPos);
+                // let tilePos = tileX[i] + tileY[i];
+                // let goalPos = goalX[tile] + goalY[tile];
+                console.log("tile: " + tile);
+                console.log("pos: " + tileX[i] + " " + tileY[i]);
+                console.log("goal: " + goalX[tile] + " " + goalY[tile]);
+                let md = Math.abs(tileX[i]- goalX[tile]) + Math.abs(tileY[i]- goalY[tile])
+                console.log(md);
+                manhattanDist += md;
             }
             console.log(node.stateStr);     // test
+            console.log("Manhattan Distance: " + manhattanDist); // test
+            /*
           //  if (node.parent.stateStr == "[4,1,2,5,0,3,7,8,6]") {  // test
-                console.log(manhattanDist); // test
                 console.log();  // test
          //    }                // test
+            */
             return (node.pathCost + manhattanDist);
             break;
     default: return 0;
@@ -119,25 +128,17 @@ function* expand(puzzle, node, f = 0) {
 
 function pathStates(node) {
 /* the sequence of states to get to this node */
-    let paths = [[1, 2, 3, 4, 5, 6, 7, 8, 0]];      // make [] if you don't want the starting state in the array
+    let paths = ["[1,2,3,4,5,6,7,8,0]"];      // make [] if you don't want the starting state in the array
 
     if (node.stateStr == "[1,2,3,4,5,6,7,8,0]" ) {
-        // console.log("Moves: 0");
         console.log("Puzzle already solved");
     }
-/*
-    else if (node.pathCost == 0) {
-         // console.log("Moves: 1");
-         paths.unshift(node.state);
-    }
-*/
     else {
-        // console.log("Moves: " + (node.pathCost + 1));
         while (node.parent != null) {
-            paths.unshift(node.state);
+            paths.unshift(node.stateStr);
             node = node.parent;
         }
-        paths.unshift(node.state);
+        paths.unshift(node.stateStr);
     }
     console.log ("Moves: " + (paths.length - 1));
     return paths;
@@ -282,13 +283,13 @@ function depthFirstSearch(puzzle, node = null) {
 function bestFirstSearch(puzzle, f = 0) {
 /* search shallowest nodes in the search tree first */
     node = new Node(puzzle.initial);        // start with the initial puzzle
-    console.log("Initial Puzzle");           // test
-    node.print();                           // test
+    // console.log("Initial Puzzle");           // test
+    // node.print();                           // test
 
     frontier = new PriorityQueue;           // a new frontier
     frontier.add(node);                     // put the initial puzzle in the frontier queue
-    console.log("Initial Frontier");        // test
-    frontier.print();                       // test
+    // console.log("Initial Frontier");        // test
+    // frontier.print();                       // test
     // frontier.printScores();                 // test
     let reached = [puzzle.stateStr];         // array containing states already reached and their scores
     if (puzzle.isGoal(puzzle.initialStr)) {    // check that that the puzzle isn't already solved
@@ -296,9 +297,9 @@ function bestFirstSearch(puzzle, f = 0) {
         return node;
     }
     while (!frontier.isEmpty()) {
-        console.log("popping node");                // test
+        //console.log("popping node");                // test
         node = frontier.pop();                              // take the node with the lowest score
-        node.print();                                   // test
+        //node.print();                                   // test
         const newNode = expand(puzzle, node, f);               // create newNode to hold what comes out of generator
         for (let action in puzzle.actions(node.state)) {    // generate one node per possible move
             let child = newNode.next().value;               // generate!
@@ -356,8 +357,9 @@ let p31 = new Puzzle([8, 6, 7, 2, 5, 4, 3, 0, 1], 0);
 /*
 console.log(aStarManhattan(p7));
 
-let paths = (pathStates(breadthFirstSearch(p7)));
 
+let paths = (pathStates(aStarHamming(p23)));
+let paths = (pathStates(breadthFirstSearch(p23)));
 */
-let paths = (pathStates(aStarManhattan(p7)));
+let paths = (pathStates(aStarManhattan(p23)));
 console.log(paths);
