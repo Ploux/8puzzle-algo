@@ -2,6 +2,7 @@
 
 /**************************************************************************************************************************************
 
+
 Inputs: an 8-puzzle problem in the form of an array:
 
 [[pos0,pos1...pos8], algorithm, depth]
@@ -170,6 +171,7 @@ function heuristic(f, node) {
             break;
 
     case 5: // h = number of swaps to solve if you can swap any tile with the blank tile
+
             let swaps = 0;
             let P = [...node.state];
             let zero = P.findIndex(elem => elem == 0);
@@ -229,10 +231,10 @@ function* expand(puzzle, node, f = 0, depth) {
 
 function pathStates(node) {
 /* the sequence of states to get to this node, and some statistics */
-    let paths = ["[1,2,3,4,5,6,7,8,0]"];      // make [] if you don't want the starting state in the array
+    let paths = [];      // make [] if you don't want the goal state in the array
 
     if (node.stateStr == "[1,2,3,4,5,6,7,8,0]" ) { // puzzle already solved
-         paths = ["[1,2,3,4,5,6,7,8,0]"];
+         paths = [];
     }
     else {
         while (node.parent != null) {       // trace back parentage
@@ -386,5 +388,5 @@ let p23 = ([ 1, 4, 2, 0, 7, 5, 3, 6, 8 ]);
 let p31 = ([ 8, 6, 7, 2, 5, 4, 3, 0, 1] );
 */
 
-// console.log(solver([ 4, 0, 2, 5, 1, 3, 7, 8, 6   , 4  , 0  ]));
+console.log(solver([ 1, 4, 2, 0, 7, 5, 3, 6, 8  , 3  , 0  ]));
 

@@ -1,7 +1,6 @@
 # 8puzzle-algo
 Javascript algorithms for solving an 8-puzzle
 
-[Visualization](https://tristanpenman.com/demos/n-puzzle/)
 
 ## Python version
 
